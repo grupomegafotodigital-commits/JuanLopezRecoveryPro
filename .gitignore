@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.env
+
+# Carpetas generadas por el programa
+logs/
+reports/
+recovered/
+build/
+
+# Sistema
+Thumbs.db
+.DS_Store
+
+# Visual Studio Code
+.vscode/
