@@ -1,42 +1,37 @@
+import hashlib
 import os
+import time
+
+from core.logger import Logger
 
 
 class ImageCreator:
-    """
-    Crea una imagen binaria (.img) de un dispositivo.
-
-    Esta es una primera versión.
-    Más adelante agregaremos:
-    - Barra de progreso
-    - Cancelar
-    - Pausar
-    - Reanudar
-    - Verificación CRC
-    - Hash MD5/SHA256
-    """
 
     BUFFER_SIZE = 1024 * 1024  # 1 MB
 
     def __init__(self):
+
         self.cancelled = False
 
     def cancel(self):
+
         self.cancelled = True
 
-    def create_image(self, source_path, destination_path, progress_callback=None):
-        """
-        source_path:
-            Ejemplo:
-            \\\\.\\PhysicalDrive1
+    def create_image(
+        self,
+        source_path,
+        destination_path,
+        total_size,
+        progress_callback=None,
+    ):
 
-        destination_path:
-            Ejemplo:
-            D:\\Backup\\sdcard.img
-        """
-
-        total_size = os.path.getsize(source_path)
+        Logger.info(f"Iniciando imagen de {source_path}")
 
         copied = 0
+
+        start_time = time.time()
+
+        sha256 = hashlib.sha256()
 
         with open(source_path, "rb") as source:
 
@@ -45,6 +40,9 @@ class ImageCreator:
                 while True:
 
                     if self.cancelled:
+
+                        Logger.warning("Proceso cancelado")
+
                         return False
 
                     data = source.read(self.BUFFER_SIZE)
@@ -54,6 +52,8 @@ class ImageCreator:
 
                     destination.write(data)
 
+                    sha256.update(data)
+
                     copied += len(data)
 
                     if progress_callback:
@@ -62,4 +62,18 @@ class ImageCreator:
 
                         progress_callback(percent)
 
-        return destination_path
+        elapsed = time.time() - start_time
+
+        Logger.info(
+            f"Imagen creada correctamente en {elapsed:.2f} segundos"
+        )
+
+        Logger.info(
+            f"SHA256: {sha256.hexdigest()}"
+        )
+
+        return {
+            "path": destination_path,
+            "sha256": sha256.hexdigest(),
+            "seconds": elapsed,
+        }

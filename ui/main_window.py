@@ -11,9 +11,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from core.disk_scanner import DiskScanner
-from core.image_creator import ImageCreator
+from controllers.recovery_controller import RecoveryController
 from core.logger import Logger
 
 from ui.panels.left_panel import LeftPanel
@@ -28,6 +26,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.disks = []
+        self.controller = RecoveryController()
 
         self.setWindowTitle(self.APP_NAME)
         self.resize(1400, 850)
@@ -126,9 +125,7 @@ class MainWindow(QMainWindow):
 
         try:
 
-            scanner = DiskScanner()
-
-            self.disks = scanner.scan()
+            self.disks = self.controller.scan_disks()
 
             if not self.disks:
 
@@ -269,23 +266,24 @@ DEVICE ID
 
         try:
 
-            creator = ImageCreator()
-
-            creator.create_image(
-                disk.deviceid,
-                filename,
-                self.right_panel.progress.setValue
-            )
+            resultado = self.controller.create_image(
+    disk,
+    filename,
+    self.right_panel.progress.setValue,
+)
 
             self.right_panel.progress.setValue(100)
 
             Logger.info(f"Imagen creada correctamente: {filename}")
 
             QMessageBox.information(
-                self,
-                "Proceso finalizado",
-                "La imagen se creó correctamente."
-            )
+    self,
+    "Proceso finalizado",
+    (
+        "La imagen se creó correctamente.\n\n"
+        f"SHA-256:\n{resultado['sha256']}"
+    )
+)
 
         except Exception as e:
 
