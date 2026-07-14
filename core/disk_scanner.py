@@ -18,23 +18,21 @@ class DiskScanner:
 
             try:
                 sectors = size // 512
-            except:
+            except Exception:
                 pass
 
             disks.append(
-    Disk(
-        index=index,
-        model=disk.Model,
-        size=size,
-        interface=disk.InterfaceType,
-        serial=getattr(disk, "SerialNumber", ""),
-        manufacturer=getattr(disk, "Manufacturer", ""),
-        partitions=getattr(disk, "Partitions", 0),
-        deviceid=disk.DeviceID,
-        sectors=sectors,
-    )
-)
-
-            })
+                Disk(
+                    index=index,
+                    model=disk.Model,
+                    size=size,
+                    interface=disk.InterfaceType,
+                    serial=getattr(disk, "SerialNumber", ""),
+                    manufacturer=getattr(disk, "Manufacturer", ""),
+                    partitions=getattr(disk, "Partitions", 0),
+                    deviceid=disk.DeviceID,
+                    sectors=sectors,
+                )
+            )
 
         return disks

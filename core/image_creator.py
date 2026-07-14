@@ -17,6 +17,12 @@ class ImageCreator:
 
     BUFFER_SIZE = 1024 * 1024  # 1 MB
 
+    def __init__(self):
+        self.cancelled = False
+
+    def cancel(self):
+        self.cancelled = True
+
     def create_image(self, source_path, destination_path, progress_callback=None):
         """
         source_path:
@@ -37,6 +43,9 @@ class ImageCreator:
             with open(destination_path, "wb") as destination:
 
                 while True:
+
+                    if self.cancelled:
+                        return False
 
                     data = source.read(self.BUFFER_SIZE)
 
